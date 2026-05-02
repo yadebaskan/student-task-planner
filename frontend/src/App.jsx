@@ -22,8 +22,20 @@ function App() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [filter, setFilter] = useState("all");
 
+  const getAuthHeaders = () => ({
+    Authorization: localStorage.getItem("token"),
+  });
+
   const fetchTasks = async () => {
-    const res = await fetch("http://localhost:3000/tasks");
+    const res = await fetch("http://localhost:3000/tasks", {
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      setTasks([]);
+      return;
+    }
+
     const data = await res.json();
     setTasks(data);
   };
@@ -83,6 +95,7 @@ function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
+    setTasks([]);
   };
 
   const addTask = async () => {
@@ -92,6 +105,7 @@ function App() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...getAuthHeaders(),
       },
       body: JSON.stringify({ title, deadline }),
     });
@@ -109,6 +123,7 @@ function App() {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        ...getAuthHeaders(),
       },
       body: JSON.stringify({ status: newStatus }),
     });
@@ -122,6 +137,7 @@ function App() {
   const deleteTask = async (id) => {
     await fetch(`http://localhost:3000/tasks/${id}`, {
       method: "DELETE",
+      headers: getAuthHeaders(),
     });
 
     fetchTasks();
