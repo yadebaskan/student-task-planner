@@ -8,29 +8,26 @@ const db = new sqlite3.Database("./tasks.db", (err) => {
   }
 });
 
-db.run(`
-  CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT,
-    status TEXT
-  )
-`);
+db.serialize(() => {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      email TEXT UNIQUE,
+      password TEXT
+    )
+  `);
 
-db.run(`ALTER TABLE tasks ADD COLUMN deadline TEXT`, (err) => {
-  if (err) {
-    console.log("deadline column already exists");
-  } else {
-    console.log("deadline column added");
-  }
+  db.run(`
+    CREATE TABLE IF NOT EXISTS tasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      deadline TEXT,
+      status TEXT DEFAULT 'todo',
+      user_id INTEGER,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+  `);
 });
-
-db.run(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    email TEXT UNIQUE,
-    password TEXT
-  )
-`);
 
 module.exports = db;

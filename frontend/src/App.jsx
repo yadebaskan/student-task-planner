@@ -1,9 +1,24 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { Pie } from "react-chartjs-2";
+
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+
+import AuthForm from "./components/AuthForm";
+import Header from "./components/Header";
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import ChartSection from "./components/ChartSection";
+import CalendarSection from "./components/CalendarSection";
+
+import { registerUser, loginUser } from "./api/authApi";
+
+import {
+  fetchTasksApi,
+  addTaskApi,
+  updateTaskApi,
+  deleteTaskApi,
+} from "./api/taskApi";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -22,22 +37,14 @@ function App() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [filter, setFilter] = useState("all");
 
-  const getAuthHeaders = () => ({
-    Authorization: localStorage.getItem("token"),
-  });
-
   const fetchTasks = async () => {
-    const res = await fetch("http://localhost:3000/tasks", {
-      headers: getAuthHeaders(),
-    });
+    const data = await fetchTasksApi();
 
-    if (!res.ok) {
+    if (Array.isArray(data)) {
+      setTasks(data);
+    } else {
       setTasks([]);
-      return;
     }
-
-    const data = await res.json();
-    setTasks(data);
   };
 
   useEffect(() => {
@@ -50,18 +57,14 @@ function App() {
   }, []);
 
   const register = async () => {
-    const res = await fetch("http://localhost:3000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, password }),
+    const result = await registerUser({
+      name,
+      email,
+      password,
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message);
+    if (!result.ok) {
+      alert(result.data.message);
       return;
     }
 
@@ -70,24 +73,20 @@ function App() {
   };
 
   const login = async () => {
-    const res = await fetch("http://localhost:3000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
+    const result = await loginUser({
+      email,
+      password,
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message);
+    if (!result.ok) {
+      alert(result.data.message);
       return;
     }
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    setUser(data.user);
+    localStorage.setItem("token", result.data.token);
+    localStorage.setItem("user", JSON.stringify(result.data.user));
+
+    setUser(result.data.user);
     fetchTasks();
   };
 
@@ -99,15 +98,14 @@ function App() {
   };
 
   const addTask = async () => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      alert("Task title is required");
+      return;
+    }
 
-    await fetch("http://localhost:3000/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders(),
-      },
-      body: JSON.stringify({ title, deadline }),
+    await addTaskApi({
+      title,
+      deadline,
     });
 
     setTitle("");
@@ -119,26 +117,13 @@ function App() {
     const currentStatus = String(task.status).toLowerCase().trim();
     const newStatus = currentStatus === "done" ? "todo" : "done";
 
-    const res = await fetch(`http://localhost:3000/tasks/${task.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeaders(),
-      },
-      body: JSON.stringify({ status: newStatus }),
-    });
+    await updateTaskApi(task.id, newStatus);
 
-    const data = await res.json();
-    console.log("Updated task:", data);
-
-    await fetchTasks();
+    fetchTasks();
   };
 
   const deleteTask = async (id) => {
-    await fetch(`http://localhost:3000/tasks/${id}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
+    await deleteTaskApi(id);
 
     fetchTasks();
   };
@@ -190,46 +175,18 @@ function App() {
   if (!user) {
     return (
       <div className={darkMode ? "app dark" : "app"}>
-        <div className="authCard">
-          <h1>{authMode === "login" ? "Login" : "Register"}</h1>
-          <p>Welcome to Student Task Planner</p>
-
-          {authMode === "register" && (
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Full name"
-            />
-          )}
-
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-          />
-
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            type="password"
-          />
-
-          <button onClick={authMode === "login" ? login : register}>
-            {authMode === "login" ? "Login" : "Register"}
-          </button>
-
-          <button
-            className="linkBtn"
-            onClick={() =>
-              setAuthMode(authMode === "login" ? "register" : "login")
-            }
-          >
-            {authMode === "login"
-              ? "Don't have an account? Register"
-              : "Already have an account? Login"}
-          </button>
-        </div>
+        <AuthForm
+          authMode={authMode}
+          name={name}
+          email={email}
+          password={password}
+          setName={setName}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          register={register}
+          login={login}
+          setAuthMode={setAuthMode}
+        />
       </div>
     );
   }
@@ -237,40 +194,21 @@ function App() {
   return (
     <div className={darkMode ? "app dark" : "app"}>
       <div className="card">
-        <div className="header">
-          <div>
-            <h1>Student Task Planner</h1>
-            <p>Welcome, {user.name}. Plan your study tasks.</p>
-          </div>
+        <Header
+          user={user}
+          tasks={tasks}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          logout={logout}
+        />
 
-          <div className="headerRight">
-            <span className="badge">{tasks.length} tasks</span>
-
-            <button className="darkBtn" onClick={() => setDarkMode(!darkMode)}>
-              {darkMode ? "Light Mode" : "Dark Mode"}
-            </button>
-
-            <button className="logoutBtn" onClick={logout}>
-              Logout
-            </button>
-          </div>
-        </div>
-
-        <div className="form">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Example: Study Software Architecture"
-          />
-
-          <input
-            type="date"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-          />
-
-          <button onClick={addTask}>Add Task</button>
-        </div>
+        <TaskForm
+          title={title}
+          deadline={deadline}
+          setTitle={setTitle}
+          setDeadline={setDeadline}
+          addTask={addTask}
+        />
 
         <div className="filterButtons">
           <button
@@ -298,70 +236,21 @@ function App() {
           </button>
         </div>
 
-        <div style={{ width: "250px", margin: "20px auto" }}>
-          <Pie data={chartData} />
-        </div>
+        <ChartSection chartData={chartData} />
 
-        <div className="calendarSection">
-          <h2>Calendar</h2>
+        <CalendarSection
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          selectedDateString={selectedDateString}
+          tasksForSelectedDate={tasksForSelectedDate}
+        />
 
-          <Calendar onChange={setSelectedDate} value={selectedDate} />
-
-          <div className="calendarTasks">
-            <h3>Tasks on {selectedDateString}</h3>
-
-            {tasksForSelectedDate.length === 0 ? (
-              <p>No tasks for this date.</p>
-            ) : (
-              tasksForSelectedDate.map((task) => (
-                <div className="calendarTask" key={task.id}>
-                  {task.title} - {task.status}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="taskList">
-          {filteredTasks.length === 0 ? (
-            <p className="empty">No tasks found for this filter.</p>
-          ) : (
-            filteredTasks.map((task) => (
-              <div
-                className={`taskItem ${
-                  String(task.status).toLowerCase().trim() === "done"
-                    ? "doneTask"
-                    : ""
-                }`}
-                key={task.id}
-              >
-                <div>
-                  <h3>{task.title}</h3>
-                  <p>Status: {task.status}</p>
-
-                  <p className={isOverdue(task) ? "overdueText" : ""}>
-                    Deadline: {task.deadline || "No deadline"}
-                  </p>
-                </div>
-
-                <div className="actions">
-                  <button className="doneBtn" onClick={() => toggleStatus(task)}>
-                    {String(task.status).toLowerCase().trim() === "done"
-                      ? "Undo"
-                      : "Done"}
-                  </button>
-
-                  <button
-                    className="deleteBtn"
-                    onClick={() => deleteTask(task.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <TaskList
+          filteredTasks={filteredTasks}
+          toggleStatus={toggleStatus}
+          deleteTask={deleteTask}
+          isOverdue={isOverdue}
+        />
       </div>
     </div>
   );
