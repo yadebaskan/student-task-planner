@@ -8,10 +8,21 @@ const getTasksByUser = (userId, callback) => {
   );
 };
 
-const createTask = (title, deadline, userId, callback) => {
+const createTask = (title, deadline, priority, category, userId, callback) => {
   db.run(
-    "INSERT INTO tasks (title, deadline, status, user_id) VALUES (?, ?, ?, ?)",
-    [title, deadline, "todo", userId],
+    `
+    INSERT INTO tasks 
+    (title, deadline, priority, category, status, user_id) 
+    VALUES (?, ?, ?, ?, ?, ?)
+    `,
+    [
+      title,
+      deadline,
+      priority || "Medium",
+      category || "Study",
+      "todo",
+      userId,
+    ],
     callback
   );
 };
@@ -63,6 +74,39 @@ const getTasksByDeadline = (deadline, userId, callback) => {
   );
 };
 
+const getTasksByCategory = (category, userId, callback) => {
+  db.all(
+    "SELECT * FROM tasks WHERE category = ? AND user_id = ? ORDER BY id DESC",
+    [category, userId],
+    callback
+  );
+};
+
+const searchTasks = (query, userId, callback) => {
+  db.all(
+    `
+    SELECT * FROM tasks
+    WHERE user_id = ?
+    AND title LIKE ?
+    ORDER BY id DESC
+    `,
+    [userId, `%${query}%`],
+    callback
+  );
+};
+
+const updateTaskDetails = (id, title, deadline, priority, category, userId, callback) => {
+  db.run(
+    `
+    UPDATE tasks
+    SET title = ?, deadline = ?, priority = ?, category = ?
+    WHERE id = ? AND user_id = ?
+    `,
+    [title, deadline, priority, category, id, userId],
+    callback
+  );
+};
+
 module.exports = {
   getTasksByUser,
   createTask,
@@ -71,4 +115,7 @@ module.exports = {
   getTaskStats,
   getTasksByStatus,
   getTasksByDeadline,
+  getTasksByCategory,
+  searchTasks,
+  updateTaskDetails,
 };

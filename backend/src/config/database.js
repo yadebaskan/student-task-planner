@@ -23,11 +23,32 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT,
       deadline TEXT,
+      priority TEXT,
+      category TEXT,
       status TEXT DEFAULT 'todo',
-      user_id INTEGER,
-      FOREIGN KEY(user_id) REFERENCES users(id)
+      user_id INTEGER
     )
   `);
+
+  const columns = [
+    "deadline TEXT",
+    "priority TEXT",
+    "category TEXT",
+    "status TEXT DEFAULT 'todo'",
+    "user_id INTEGER",
+  ];
+
+  columns.forEach((column) => {
+    const columnName = column.split(" ")[0];
+
+    db.run(`ALTER TABLE tasks ADD COLUMN ${column}`, (err) => {
+      if (err) {
+        console.log(`${columnName} column already exists`);
+      } else {
+        console.log(`${columnName} column added`);
+      }
+    });
+  });
 });
 
 module.exports = db;

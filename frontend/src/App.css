@@ -315,3 +315,261 @@ body {
   text-decoration: line-through;
   opacity: 0.6;
 }
+
+.highPriority {
+  color: red;
+  font-weight: bold;
+}
+
+.mediumPriority {
+  color: orange;
+  font-weight: bold;
+}
+
+.lowPriority {
+  color: green;
+  font-weight: bold;
+}
+
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: 260px;
+  background: #111827;
+  color: white;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.sidebarSub {
+  color: #9ca3af;
+  margin-top: 6px;
+}
+
+.sidebarNav {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.navItem {
+  border: none;
+  background: transparent;
+  color: #d1d5db;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.navItem:hover,
+.activeNav {
+  background: #2563eb;
+  color: white;
+}
+
+.sidebarBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 30px;
+}
+
+.dashboardCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.dashboardCard {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.dashboardCard p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.dashboardCard h2 {
+  margin: 10px 0 0;
+  font-size: 32px;
+}
+
+.warningCard h2 {
+  color: #dc2626;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 24px;
+}
+
+.leftPanel,
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.dark .dashboardCard {
+  background: #1f2937;
+  color: white;
+}
+
+.dark .dashboardCard p {
+  color: #d1d5db;
+}
+
+@media (max-width: 900px) {
+  .dashboardLayout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: auto;
+  }
+
+  .dashboardCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.searchBar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.searchBar input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 15px;
+}
+
+.searchBar button {
+  padding: 14px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.clearSearchBtn {
+  background: #6b7280 !important;
+}
+
+.dark .searchBar input {
+  background: #111827;
+  color: white;
+  border-color: #374151;
+}
+
+.advancedFilters {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.advancedFilters select {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  min-width: 180px;
+  font-size: 14px;
+}
+
+.dark .advancedFilters select {
+  background: #111827;
+  color: white;
+  border-color: #374151;
+}
+
+.editBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalCard {
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modalCard input,
+.modalCard select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.modalButtons button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background: #6b7280;
+  color: white;
+}
+
+.dark .modalCard {
+  background: #1f2937;
+  color: white;
+}

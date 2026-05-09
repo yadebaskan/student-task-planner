@@ -6,7 +6,7 @@ const getHeaders = () => ({
 });
 
 export const fetchTasksApi = async () => {
-  const res = await fetch(API_URL, {
+  const res = await fetch(`${API_URL}?page=1&limit=100`, {
     headers: getHeaders(),
   });
 
@@ -37,6 +37,24 @@ export const deleteTaskApi = async (id) => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
     headers: getHeaders(),
+  });
+
+  return await res.json();
+};
+
+export const searchTasksApi = async (query) => {
+  const res = await fetch(`${API_URL}/search?q=${query}`, {
+    headers: getHeaders(),
+  });
+
+  return await res.json();
+};
+
+export const editTaskApi = async (id, taskData) => {
+  const res = await fetch(`${API_URL}/${id}`, {
+    method: "PATCH",
+    headers: getHeaders(),
+    body: JSON.stringify(taskData),
   });
 
   return await res.json();
