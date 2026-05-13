@@ -1,0 +1,635 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 850px;
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 34px;
+}
+
+.header p {
+  margin: 8px 0 0;
+  color: #64748b;
+}
+
+.badge {
+  background: #4f46e5;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.form input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  font-size: 16px;
+  outline: none;
+}
+
+.form input:focus {
+  border-color: #4f46e5;
+}
+
+.form button {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 22px;
+  background: #4f46e5;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form button:hover {
+  background: #4338ca;
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.taskItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.taskItem h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.taskItem p {
+  margin: 6px 0 0;
+  color: #64748b;
+}
+
+.status {
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.empty {
+  color: #64748b;
+  text-align: center;
+  padding: 24px;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.actions button {
+  border: none;
+  padding: 9px 14px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.doneBtn {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.deleteBtn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.doneTask {
+  opacity: 0.75;
+}
+
+.doneTask h3 {
+  text-decoration: line-through;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 430px;
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.authCard h1 {
+  margin: 0;
+  color: #1e293b;
+}
+
+.authCard p {
+  margin: 0 0 10px;
+  color: #64748b;
+}
+
+.authCard input {
+  padding: 14px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  font-size: 16px;
+}
+
+.authCard button {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 22px;
+  background: #4f46e5;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.linkBtn {
+  background: transparent !important;
+  color: #4f46e5 !important;
+  padding: 8px !important;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoutBtn {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 16px;
+  background: #0f172a;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.calendarSection {
+  margin: 24px 0;
+  padding: 20px;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.calendarSection h2 {
+  margin-top: 0;
+  color: #1e293b;
+}
+
+.react-calendar {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  padding: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.calendarTasks {
+  margin-top: 18px;
+}
+
+.calendarTask {
+  padding: 12px;
+  border-radius: 12px;
+  background: white;
+  margin-top: 10px;
+  border: 1px solid #e2e8f0;
+  font-weight: bold;
+}
+
+.dark .calendarSection {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.dark .calendarSection h2 {
+  color: white;
+}
+
+.dark .react-calendar {
+  background: #111827;
+  color: white;
+}
+
+.dark .react-calendar button {
+  color: white;
+}
+
+.dark .calendarTask {
+  background: #111827;
+  border-color: #374151;
+  color: white;
+}
+
+.filterButtons {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.filterButtons button {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.filterButtons button:hover {
+  background: #c7d2fe;
+}
+
+.dark .filterButtons button {
+  background: #374151;
+  color: white;
+}
+
+.activeFilter {
+  background: #4f46e5 !important;
+  color: white !important;
+}
+
+.overdueText {
+  color: #dc2626 !important;
+  font-weight: bold;
+}
+
+.doneTask h3 {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.highPriority {
+  color: red;
+  font-weight: bold;
+}
+
+.mediumPriority {
+  color: orange;
+  font-weight: bold;
+}
+
+.lowPriority {
+  color: green;
+  font-weight: bold;
+}
+
+.dashboardLayout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: 260px;
+  background: #111827;
+  color: white;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.sidebarSub {
+  color: #9ca3af;
+  margin-top: 6px;
+}
+
+.sidebarNav {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.navItem {
+  border: none;
+  background: transparent;
+  color: #d1d5db;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.navItem:hover,
+.activeNav {
+  background: #2563eb;
+  color: white;
+}
+
+.sidebarBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 30px;
+}
+
+.dashboardCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.dashboardCard {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.dashboardCard p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.dashboardCard h2 {
+  margin: 10px 0 0;
+  font-size: 32px;
+}
+
+.warningCard h2 {
+  color: #dc2626;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 24px;
+}
+
+.leftPanel,
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.dark .dashboardCard {
+  background: #1f2937;
+  color: white;
+}
+
+.dark .dashboardCard p {
+  color: #d1d5db;
+}
+
+@media (max-width: 900px) {
+  .dashboardLayout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: auto;
+  }
+
+  .dashboardCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.searchBar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.searchBar input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 15px;
+}
+
+.searchBar button {
+  padding: 14px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.clearSearchBtn {
+  background: #6b7280 !important;
+}
+
+.dark .searchBar input {
+  background: #111827;
+  color: white;
+  border-color: #374151;
+}
+
+.advancedFilters {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.advancedFilters select {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  min-width: 180px;
+  font-size: 14px;
+}
+
+.dark .advancedFilters select {
+  background: #111827;
+  color: white;
+  border-color: #374151;
+}
+
+.editBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalCard {
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modalCard input,
+.modalCard select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.modalButtons button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background: #6b7280;
+  color: white;
+}
+
+.dark .modalCard {
+  background: #1f2937;
+  color: white;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.pagination button {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.taskItem {
+  background: white;
+  border-radius: 18px;
+}
+
+.taskMeta {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.taskMeta span {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  margin: 0;
+}
+
+.statusBadge,
+.priorityBadge,
+.categoryBadge,
+.deadlineBadge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.overdueBadge {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.taskItem.overdueTask {
+  border-left: 5px solid #dc2626;
+}
