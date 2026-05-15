@@ -13,6 +13,8 @@ import CalendarSection from "./components/CalendarSection";
 import Sidebar from "./components/Sidebar";
 import DashboardCards from "./components/DashboardCards";
 import EditTaskModal from "./components/EditTaskModal";
+import DueToday from "./components/DueToday";
+import OverdueTasks from "./components/OverdueTasks";
 
 import { registerUser, loginUser } from "./api/authApi";
 
@@ -49,28 +51,39 @@ function App() {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [editingTask, setEditingTask] = useState(null);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchTasks = async (currentPage = page) => {
   const data = await fetchTasksApi(currentPage);
 
-  if (data.tasks) {
+  console.log("Fetched tasks:", data);
+
+  if (data && Array.isArray(data.tasks)) {
     setTasks(data.tasks);
     setTotalPages(data.totalPages || 1);
-  } else {
-    setTasks([]);
+    return;
   }
+
+  if (Array.isArray(data)) {
+    setTasks(data);
+    setTotalPages(1);
+    return;
+  }
+
+  setTasks([]);
+  setTotalPages(1);
 };
 
   useEffect(() => {
-  const savedUser = localStorage.getItem("user");
+    const savedUser = localStorage.getItem("user");
 
-  if (savedUser) {
-    setUser(JSON.parse(savedUser));
-    fetchTasks(page);
-  }
-}, [page]);
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      fetchTasks(page);
+    }
+  }, [page]);
 
   const register = async () => {
     const result = await registerUser({
@@ -103,7 +116,8 @@ function App() {
     localStorage.setItem("user", JSON.stringify(result.data.user));
 
     setUser(result.data.user);
-    fetchTasks();
+    setPage(1);
+    fetchTasks(1);
   };
 
   const logout = () => {
@@ -111,33 +125,41 @@ function App() {
     localStorage.removeItem("user");
     setUser(null);
     setTasks([]);
+    setPage(1);
+    setTotalPages(1);
   };
 
   const addTask = async () => {
-    if (!title.trim()) {
-      alert("Task title is required");
-      return;
-    }
+  if (!title.trim()) {
+    alert("Task title is required");
+    return;
+  }
 
-    const result = await addTaskApi({
-      title,
-      deadline,
-      priority,
-      category,
-    });
+  const result = await addTaskApi({
+    title,
+    deadline,
+    priority,
+    category,
+  });
 
-    if (result.message && !result.id) {
-      alert(result.message);
-      return;
-    }
+  if (result.message && !result.id) {
+    alert(result.message);
+    return;
+  }
 
-    setTasks((prevTasks) => [result, ...prevTasks]);
+  setTasks((prevTasks) => [result, ...prevTasks]);
 
-    setTitle("");
-    setDeadline("");
-    setPriority("Medium");
-    setCategory("Study");
-  };
+  setTitle("");
+  setDeadline("");
+  setPriority("Medium");
+  setCategory("Study");
+
+  setFilter("all");
+  setPriorityFilter("all");
+  setCategoryFilter("all");
+  setSearchQuery("");
+  setPage(1);
+};
 
   const toggleStatus = async (task) => {
     const currentStatus = String(task.status).toLowerCase().trim();
@@ -155,7 +177,7 @@ function App() {
   const deleteTask = async (id) => {
     await deleteTaskApi(id);
 
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    fetchTasks(page);
   };
 
   const saveEditedTask = async (updatedTask) => {
@@ -177,7 +199,7 @@ function App() {
 
   const searchTasks = async () => {
     if (!searchQuery.trim()) {
-      fetchTasks();
+      fetchTasks(page);
       return;
     }
 
@@ -185,6 +207,7 @@ function App() {
 
     if (Array.isArray(data)) {
       setTasks(data);
+      setTotalPages(1);
     }
   };
 
@@ -196,13 +219,9 @@ function App() {
       return false;
     }
 
-    const today = new Date();
-    const deadlineDate = new Date(task.deadline);
+    const todayString = new Date().toISOString().split("T")[0];
 
-    today.setHours(0, 0, 0, 0);
-    deadlineDate.setHours(0, 0, 0, 0);
-
-    return deadlineDate < today;
+    return task.deadline < todayString;
   };
 
   const doneCount = tasks.filter(
@@ -289,6 +308,12 @@ function App() {
 
           <DashboardCards tasks={tasks} />
 
+          <div className="highlightGrid">
+            <DueToday tasks={tasks} />
+
+            <OverdueTasks tasks={tasks} isOverdue={isOverdue} />
+          </div>
+
           <div className="searchBar">
             <input
               value={searchQuery}
@@ -302,7 +327,7 @@ function App() {
               className="clearSearchBtn"
               onClick={() => {
                 setSearchQuery("");
-                fetchTasks();
+                fetchTasks(page);
               }}
             >
               Clear
@@ -366,25 +391,23 @@ function App() {
               />
             </div>
           </section>
+
           <div className="pagination">
-  <button
-    disabled={page === 1}
-    onClick={() => setPage(page - 1)}
-  >
-    Previous
-  </button>
+            <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+              Previous
+            </button>
 
-  <span>
-    Page {page} of {totalPages}
-  </span>
+            <span>
+              Page {page} of {totalPages}
+            </span>
 
-  <button
-    disabled={page === totalPages}
-    onClick={() => setPage(page + 1)}
-  >
-    Next
-  </button>
-</div>
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              Next
+            </button>
+          </div>
 
           <EditTaskModal
             editingTask={editingTask}

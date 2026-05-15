@@ -6,12 +6,9 @@ const getHeaders = () => ({
 });
 
 export const fetchTasksApi = async (page = 1) => {
-  const res = await fetch(
-    `${API_URL}?page=${page}&limit=5`,
-    {
-      headers: getHeaders(),
-    }
-  );
+  const res = await fetch(`${API_URL}?page=${page}&limit=5`, {
+    headers: getHeaders(),
+  });
 
   return await res.json();
 };

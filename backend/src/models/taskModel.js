@@ -1,9 +1,16 @@
 const db = require("../config/database");
 
-const getTasksByUser = (userId, callback) => {
+const getTasksByUser = (userId, page = 1, limit = 5, callback) => {
+  const offset = (page - 1) * limit;
+
   db.all(
-    "SELECT * FROM tasks WHERE user_id = ? ORDER BY id DESC",
-    [userId],
+    `
+    SELECT * FROM tasks
+    WHERE user_id = ?
+    ORDER BY id DESC
+    LIMIT ? OFFSET ?
+    `,
+    [userId, limit, offset],
     callback
   );
 };
@@ -95,7 +102,15 @@ const searchTasks = (query, userId, callback) => {
   );
 };
 
-const updateTaskDetails = (id, title, deadline, priority, category, userId, callback) => {
+const updateTaskDetails = (
+  id,
+  title,
+  deadline,
+  priority,
+  category,
+  userId,
+  callback
+) => {
   db.run(
     `
     UPDATE tasks
@@ -103,6 +118,14 @@ const updateTaskDetails = (id, title, deadline, priority, category, userId, call
     WHERE id = ? AND user_id = ?
     `,
     [title, deadline, priority, category, id, userId],
+    callback
+  );
+};
+
+const countTasksByUser = (userId, callback) => {
+  db.get(
+    "SELECT COUNT(*) AS total FROM tasks WHERE user_id = ?",
+    [userId],
     callback
   );
 };
@@ -118,4 +141,5 @@ module.exports = {
   getTasksByCategory,
   searchTasks,
   updateTaskDetails,
+  countTasksByUser,
 };

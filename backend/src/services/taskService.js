@@ -9,17 +9,46 @@ const {
   getTasksByCategory,
   searchTasks,
   updateTaskDetails,
+  countTasksByUser,
 } = require("../models/taskModel");
 
-const fetchTasks = (userId) => {
+const fetchTasks = (userId, page = 1, limit = 5) => {
+  const currentPage = Number(page) || 1;
+  const pageLimit = Number(limit) || 5;
+
   return new Promise((resolve, reject) => {
-    getTasksByUser(userId, (err, rows) => {
+    getTasksByUser(userId, currentPage, pageLimit, (err, rows) => {
       if (err) {
-        reject({ status: 500, message: "Failed to fetch tasks" });
+        reject({
+          status: 500,
+          message: "Failed to fetch tasks",
+        });
         return;
       }
 
-      resolve(rows);
+      countTasksByUser(userId, (countErr, result) => {
+        if (countErr) {
+          reject({
+            status: 500,
+            message: "Failed to count tasks",
+          });
+          return;
+        }
+
+        const totalTasks = result?.total || 0;
+        const totalPages = Math.max(
+          1,
+          Math.ceil(totalTasks / pageLimit)
+        );
+
+        resolve({
+          tasks: rows,
+          totalTasks,
+          totalPages,
+          currentPage,
+          limit: pageLimit,
+        });
+      });
     });
   });
 };
@@ -42,6 +71,7 @@ const addNewTask = (title, deadline, priority, category, userId) => {
         priority: priority || "Medium",
         category: category || "Study",
         status: "todo",
+        user_id: userId,
       });
     });
   });
@@ -57,6 +87,7 @@ const changeTaskStatus = (id, status, userId) => {
 
       resolve({
         message: "Task updated",
+        changes: this.changes,
       });
     });
   });
@@ -72,6 +103,7 @@ const removeExistingTask = (id, userId) => {
 
       resolve({
         message: "Task deleted",
+        changes: this.changes,
       });
     });
   });
@@ -85,7 +117,11 @@ const fetchTaskStats = (userId) => {
         return;
       }
 
-      resolve(stats);
+      resolve({
+        done: stats?.done || 0,
+        todo: stats?.todo || 0,
+        total: stats?.total || 0,
+      });
     });
   });
 };
@@ -156,16 +192,25 @@ const searchUserTasks = (query, userId) => {
 
 const editExistingTask = (id, title, deadline, priority, category, userId) => {
   return new Promise((resolve, reject) => {
-    updateTaskDetails(id, title, deadline, priority, category, userId, function (err) {
-      if (err) {
-        reject({ status: 500, message: "Failed to edit task" });
-        return;
-      }
+    updateTaskDetails(
+      id,
+      title,
+      deadline,
+      priority,
+      category,
+      userId,
+      function (err) {
+        if (err) {
+          reject({ status: 500, message: "Failed to edit task" });
+          return;
+        }
 
-      resolve({
-        message: "Task edited successfully",
-      });
-    });
+        resolve({
+          message: "Task edited successfully",
+          changes: this.changes,
+        });
+      }
+    );
   });
 };
 

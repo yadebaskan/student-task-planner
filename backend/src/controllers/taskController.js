@@ -13,14 +13,17 @@ const {
 
 const taskSchema = require("../validation/taskValidation");
 
+const allowedStatuses = ["todo", "done"];
+const allowedCategories = ["Study", "Work", "Personal", "Health"];
+
 const getTasks = async (req, res) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.max(1, Number(req.query.limit) || 5);
 
-    const tasks = await fetchTasks(req.user.id, page, limit);
+    const result = await fetchTasks(req.user.id, page, limit);
 
-    res.json(tasks);
+    res.json(result);
   } catch (error) {
     res.status(error.status || 500).json({
       message: error.message || "Server error",
@@ -41,14 +44,14 @@ const addTask = async (req, res) => {
     const { title, deadline, priority, category } = req.body;
 
     const task = await addNewTask(
-      title,
+      title.trim(),
       deadline,
       priority,
       category,
       req.user.id
     );
 
-    res.json(task);
+    res.status(201).json(task);
   } catch (error) {
     res.status(error.status || 500).json({
       message: error.message || "Server error",
@@ -58,16 +61,22 @@ const addTask = async (req, res) => {
 
 const updateTask = async (req, res) => {
   try {
-    const { id } = req.params;
+    const taskId = Number(req.params.id);
     const { status } = req.body;
 
-    if (!["todo", "done"].includes(status)) {
+    if (!taskId) {
+      return res.status(400).json({
+        message: "Invalid task id",
+      });
+    }
+
+    if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         message: "Invalid task status",
       });
     }
 
-    const result = await changeTaskStatus(id, status, req.user.id);
+    const result = await changeTaskStatus(taskId, status, req.user.id);
 
     res.json(result);
   } catch (error) {
@@ -79,9 +88,15 @@ const updateTask = async (req, res) => {
 
 const removeTask = async (req, res) => {
   try {
-    const { id } = req.params;
+    const taskId = Number(req.params.id);
 
-    const result = await removeExistingTask(id, req.user.id);
+    if (!taskId) {
+      return res.status(400).json({
+        message: "Invalid task id",
+      });
+    }
+
+    const result = await removeExistingTask(taskId, req.user.id);
 
     res.json(result);
   } catch (error) {
@@ -107,7 +122,7 @@ const tasksByStatus = async (req, res) => {
   try {
     const { status } = req.params;
 
-    if (!["todo", "done"].includes(status)) {
+    if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         message: "Invalid task status",
       });
@@ -141,8 +156,6 @@ const tasksByCategory = async (req, res) => {
   try {
     const { category } = req.params;
 
-    const allowedCategories = ["Study", "Work", "Personal", "Health"];
-
     if (!allowedCategories.includes(category)) {
       return res.status(400).json({
         message: "Invalid task category",
@@ -161,9 +174,9 @@ const tasksByCategory = async (req, res) => {
 
 const searchTasksController = async (req, res) => {
   try {
-    const { q } = req.query;
+    const query = String(req.query.q || "").trim();
 
-    const tasks = await searchUserTasks(q || "", req.user.id);
+    const tasks = await searchUserTasks(query, req.user.id);
 
     res.json(tasks);
   } catch (error) {
@@ -175,6 +188,14 @@ const searchTasksController = async (req, res) => {
 
 const editTask = async (req, res) => {
   try {
+    const taskId = Number(req.params.id);
+
+    if (!taskId) {
+      return res.status(400).json({
+        message: "Invalid task id",
+      });
+    }
+
     const { error } = taskSchema.validate(req.body);
 
     if (error) {
@@ -183,12 +204,11 @@ const editTask = async (req, res) => {
       });
     }
 
-    const { id } = req.params;
     const { title, deadline, priority, category } = req.body;
 
     const result = await editExistingTask(
-      id,
-      title,
+      taskId,
+      title.trim(),
       deadline,
       priority,
       category,
